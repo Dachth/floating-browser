@@ -5,18 +5,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unzip project
+      - name: Unzip and prepare
         run: |
-          unzip fixed.zip
-          mv floating_browser_project_fixed/* .
-          mv floating_browser_project_fixed/.* . || true
+          unzip -o fixed.zip
+          PROJECT_DIR=$(find . -name "gradlew" | head -n 1 | xargs dirname)
+          echo "Project at $PROJECT_DIR"
+          cp -r $PROJECT_DIR/* .
           rm -rf floating_browser_project_fixed fixed.zip
+          ls -la
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
       - name: Build
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
