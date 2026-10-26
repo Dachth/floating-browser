@@ -8,11 +8,15 @@ jobs:
       - name: Unzip and prepare
         run: |
           ZIP=$(ls *.zip | head -n 1)
-          echo "Found zip: $ZIP"
+          echo "Unzipping $ZIP"
           unzip -o "$ZIP"
-          PROJECT_DIR=$(find . -maxdepth 2 -name "gradlew" | head -n 1 | xargs dirname)
-          echo "Project at $PROJECT_DIR"
-          cp -r $PROJECT_DIR/* .
+          GRADLEW_PATH=$(find . -name "gradlew" -type f | head -n 1)
+          echo "Found gradlew at $GRADLEW_PATH"
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
+          echo "Project dir $PROJECT_DIR"
+          cp -rf $PROJECT_DIR/* .
+          cp -rf $PROJECT_DIR/.gradle . 2>/dev/null || true
+          cp -rf $PROJECT_DIR/gradle . 2>/dev/null || true
           ls -la
       - uses: actions/setup-java@v4
         with:
